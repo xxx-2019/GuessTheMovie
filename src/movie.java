@@ -3,10 +3,14 @@ public class movie {
     private String movieHiddenName;
     private int numberOfWords;
     private int numberOfLetter;
+    private int numberOfLetterNoSpace;
 
     public movie() {
         movieName = "";
         movieHiddenName = "";
+        numberOfWords = 0;
+        numberOfLetter = 0;
+        numberOfLetterNoSpace = 0;
     }
 
     public movie(String movieName) {
@@ -14,9 +18,17 @@ public class movie {
     }
 
     public void setMovieName(String movieName) {
+        char[] chars;
         this.movieName = movieName.toUpperCase();
-        for (int i = 0; i < movieName.length(); i++) {
-            movieHiddenName += "_";
+        chars = movieName.toCharArray();
+        numberOfLetterNoSpace = 0;
+        for (int i = 0; i < chars.length; i++) {
+            if (chars[i] == ' ') {
+                movieHiddenName += " ";
+            } else {
+                numberOfLetterNoSpace++;
+                movieHiddenName += "_";
+            }
         }
         numberOfLetter = this.movieName.length();
         numberOfWords = this.movieName.split(" ").length;
@@ -79,5 +91,9 @@ public class movie {
 
     public int getNumberOfWords() {
         return numberOfWords;
+    }
+
+    public int getNumberOfLetterNoSpace() {
+        return numberOfLetterNoSpace;
     }
 }

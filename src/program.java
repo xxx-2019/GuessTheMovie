@@ -18,6 +18,7 @@ public class program {
     public void run() {
         Scanner sc;
         String tmp;
+        boolean czySukces = false;
 
         // Sprawdzenie czy plik istnieje
         if (!checkFileMovies()) return;
@@ -26,11 +27,9 @@ public class program {
         if (!losujFilm()) return;
 
         // Ciało gry
-        //System.out.println(film.getMovieName());
-        //System.out.println(film.getMovieHihenName());
         sc = new Scanner(System.in);
         for (int i = 0; i < maxRunda; i++) {
-            System.out.println("Runda: " + (i + 1) + ". Jaki to film (Ilość znaków: " + film.getNumberOfLetter() + ", ilość wyrazów:" + film.getNumberOfWords() + ")");
+            System.out.println("Runda: " + (i + 1) + ". Jaki to film (Ilość znaków: " + film.getNumberOfLetterNoSpace() + ", ilość wyrazów:" + film.getNumberOfWords() + ")?");
             System.out.println(film.getMovieHihenName());
             tmp = sc.nextLine();
             if (tmp.length() == 1) {
@@ -39,6 +38,7 @@ public class program {
                 if (film.checkHidden()) {
                     System.out.println(film.getMovieHihenName());
                     System.out.println("GRATULACJE Wygrałeś!!!");
+                    czySukces = true;
                     break;
                 }
             } else {
@@ -47,9 +47,15 @@ public class program {
                     film.discoveredAll();
                     System.out.println(film.getMovieHihenName());
                     System.out.println("GRATULACJE Wygrałeś!!!");
+                    czySukces = true;
                     break;
                 }
             }
+        }
+        if (!czySukces) {
+            film.discoveredAll();
+            System.out.println(film.getMovieHihenName());
+            System.out.println("Niestety przegrałeś");
         }
     }
 
@@ -66,30 +72,38 @@ public class program {
 
             while (fsc.hasNextLine()) {
                 String tmp = fsc.nextLine();
-                iloscFilmow ++;
+                if (tmp.trim().length() > 0)
+                    iloscFilmow ++;
             }
             fsc.close();
 
-            // Losowanie numeru filmu z pliku
-            Random rg = new Random();
-            rn = rg.nextInt(iloscFilmow);
+            if (iloscFilmow < 3) {
+                System.out.println("Za mało tytułów filmów do odgadnięcia. Wymagane jest minimum 3 tytuły filmów");
+                System.out.println("Dodaj do pliku " + fileName + " jeszcze parę tytułów");
+            } else {
+                // Losowanie numeru filmu z pliku
+                Random rg = new Random();
+                rn = rg.nextInt(iloscFilmow);
 
-            // Pobieranie nazwy wylosowanego pliku
-            f = new File(fileName);
-            fsc = new Scanner(f);
-            iloscFilmow = 0;
+                // Pobieranie nazwy wylosowanego pliku
+                f = new File(fileName);
+                fsc = new Scanner(f);
+                iloscFilmow = 0;
 
-            while (fsc.hasNextLine()) {
-                String tmp = fsc.nextLine();
-                if (iloscFilmow == rn) {
-                    film.setMovieName(tmp.trim());
-                    break;
+                while (fsc.hasNextLine()) {
+                    String tmp = fsc.nextLine();
+                    if (tmp.trim().length() > 0) {
+                        if (iloscFilmow == rn) {
+                            film.setMovieName(tmp.trim());
+                            break;
+                        }
+                        iloscFilmow++;
+                    }
                 }
-                iloscFilmow ++;
-            }
-            fsc.close();
+                fsc.close();
 
-            ret = true;
+                ret = true;
+            }
         }
         catch (Exception e) {
             System.out.println("Wystąpił błąd: " + e.getMessage() + ". Program przerwany");
